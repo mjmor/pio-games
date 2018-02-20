@@ -1,6 +1,6 @@
 #!/bin/bash
 
-games=( "counting-animals" "hellophaser" "tutorial" "adventure-math" )
+games=( "hellophaser" "tutorial" "adventure-math" )
 
 for game in "${games[@]}"; do
     echo "Syncing game $game..."
