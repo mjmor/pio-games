@@ -5,8 +5,8 @@ function preload() {
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
-    game.load.image('addition_panel', 'assets/addition_panel.png');
-    game.load.image('subtraction_panel', 'assets/subtraction_panel.png');
+    game.load.image('addition_panel', 'assets/addition_panel_khmer.png');
+    game.load.image('subtraction_panel', 'assets/subtraction_panel_khmer.png');
     game.load.image('0', 'assets/numbers/zero.png');
     game.load.image('1', 'assets/numbers/one.png');
     game.load.image('2', 'assets/numbers/two.png');
@@ -18,8 +18,8 @@ function preload() {
     game.load.image('8', 'assets/numbers/eight.png');
     game.load.image('9', 'assets/numbers/nine.png');
     game.load.image('?', 'assets/question_mark.png');
-    game.load.image('continue_button', 'assets/continue_button.png');
-    game.load.image('retry_button', 'assets/retry_button.png');
+    game.load.image('continue_button', 'assets/continue_button_khmer.png');
+    game.load.image('retry_button', 'assets/retry_button_khmer.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
 
@@ -33,7 +33,7 @@ var cursors;
 
 var stars;
 var score = 0;
-var scoreText;
+var scoreText = "";
 
 function create() {
   //  We're going to be using physics, so enable the Arcade Physics system
@@ -99,7 +99,7 @@ function create() {
   }
 
   //  The score
-  scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+  // scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
   //  Our controls.
   cursors = game.input.keyboard.createCursorKeys();
