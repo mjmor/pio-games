@@ -39,9 +39,11 @@ class MathProblem {
         y_position = y_bot_position;
         x_position = 275;
       }
+      // bind attemptSolution to the button being pressed
+      let attemptSolution = this._attemptSolution.bind(this, num.toString());
       this.number_buttons[num].button =
         this.game.add.button(x_position, y_position, num.toString(),
-          this._attemptSolution, this); // TODO: bind _attemptSolution to
+          attemptSolution, this); // TODO: bind _attemptSolution to
       // different arguments so we know the button pressed
       x_position += separation;
     }
@@ -51,20 +53,26 @@ class MathProblem {
       "top": {
         "upperbound": 9,
         "lowerbound": 5,
-        "value": null, // string
+        "value": "", // string
         "sprites": null
       },
       "bot": {
         "upperbound": 5,
         "lowerbound": 1,
-        "value": null, // string
+        "value": "", // string
         "sprites": null
       }
     };
     this.solution = {
-      "prop_value": null, // string,
+      "prop_value": "", // string,
       "sprites": null,
-      "value": null
+      "value": "",
+      "isCorrect": function () {
+        return this.prop_value === this.value;
+      },
+      "proposedContainsEnoughDigits": function () {
+        return this.prop_value.length === this.value.length;
+      }
     };
   }
 
@@ -149,21 +157,41 @@ class MathProblem {
     for(let i = 0; i < this.number_buttons.length; i++) {
       this.number_buttons[i].button.destroy();
     }
-    // TODO: destroy buttons as well
+  }
+
+  // reset the solution UI and prop_value with func
+  _resetSolutionAttempt() {
+    this.solution.prop_value = "";
+    for (let i = 0; i < this.solution.sprites.length; i++) {
+      let x_coord = this.solution.sprites[i].position.x;
+      let y_coord = this.solution.sprites[i].position.y;
+      this.solution.sprites[i].destroy(); // remove the previous sprite (number)
+      this.solution.sprites[i] = this.game.add.sprite(x_coord, y_coord, "?");
+    }
   }
 
   _attemptSolution(numberPressed) {
     if (!this.problemGenerated) {
       return;
     }
+    this.solution.prop_value += numberPressed;
+    let digit = this.solution.prop_value.length - 1;
+    let sprite_idx = this.solution.sprites.length - (digit + 1);
+    console.log("digit: " + digit + " sprite idx: " + sprite_idx);
+    let x_coord = this.solution.sprites[sprite_idx].position.x;
+    let y_coord = this.solution.sprites[sprite_idx].position.y;
+    this.solution.sprites[sprite_idx].destroy(); // remove the previous sprite (?)
+    this.solution.sprites[sprite_idx] =
+      this.game.add.sprite(x_coord, y_coord, this.solution.prop_value[digit]);
+    if (!this.solution.proposedContainsEnoughDigits()) {
+      return;
+    }
 
-    // TODO: implement me, add the number pressed to the
-    // solution value and check if it is correct and act appropriately
-    if (true) {
+    if (this.solution.isCorrect()) {
       this._markProblemSolved();
       this.solved_cb();
     } else {
-
+      this._resetSolutionAttempt();
     }
     return;
  }

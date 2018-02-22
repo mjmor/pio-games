@@ -70,7 +70,7 @@ function create() {
 
   //  Player physics properties. Give the little guy a slight bounce.
   player.body.bounce.y = 0.2;
-  player.body.gravity.y = 300;
+  player.body.gravity.y = 350;
   player.body.collideWorldBounds = true;
 
   //  Our two animations, walking left and right.
