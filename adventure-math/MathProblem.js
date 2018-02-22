@@ -5,15 +5,16 @@
  */
 class MathProblem {
   constructor(game, problem_type, solved_cb = null) {
-    game.paused = true;
+    this.game = game;
+    this.game.paused = true;
     this.problem_type = problem_type;
     this.problemGenerated = false;
     this.solved_cb = solved_cb;
 
     if (this.problem_type === "addition") {
-      this.math_panel = game.add.sprite(175, 50, 'addition_panel');
+      this.math_panel = this.game.add.sprite(175, 50, 'addition_panel');
     } else if (this.problem_type === "addition") {
-      this.math_panel = game.add.sprite(175, 50, 'subtraction_panel');
+      this.math_panel = this.game.add.sprite(175, 50, 'subtraction_panel');
     }
 
     this.number_buttons = [{"text": "0", "button": null},
@@ -39,7 +40,7 @@ class MathProblem {
         x_position = 275;
       }
       this.number_buttons[num].button =
-        game.add.button(x_position, y_position, num.toString(),
+        this.game.add.button(x_position, y_position, num.toString(),
           this._attemptSolution, this); // TODO: bind _attemptSolution to
       // different arguments so we know the button pressed
       x_position += separation;
@@ -85,17 +86,31 @@ class MathProblem {
   // }
   // mathProblem.generateProblem();
   generateProblem() {
+    let ones_x_position = 325;
     this._generateOperands();
     this.operands.top.sprites = [];
     this.operands.bot.sprites = [];
     // TODO: leaving these as arrays to support multidigit operands in the future
-    this.operands.top.sprites.push(game.add.sprite(325, 200,
+    this.operands.top.sprites.push(this.game.add.sprite(ones_x_position, 200,
       this.operands.top.value));
-    this.operands.bot.sprites.push(game.add.sprite(325, 250,
+    this.operands.bot.sprites.push(this.game.add.sprite(ones_x_position, 247,
       this.operands.bot.value));
 
     // TODO: set the solution array to the right size with null value and
     // questions marks in the UI
+    if (this.problem_type === "addition") {
+      this.solution.value = parseInt(this.operands.top.value) + parseInt(this.operands.bot.value);
+    } else if (this.problem_type === "subtraction") {
+      this.solution.value = parseInt(this.operands.top.value) - parseInt(this.operands.bot.value);
+    }
+    this.solution.value = this.solution.value.toString();
+    this.solution.sprites = [];
+    let digit_x_position = ones_x_position;
+    for (let i = 0; i < this.solution.value.length; i++) {
+      this.solution.sprites.push(this.game.add.sprite(digit_x_position + 2, 312,
+        "?"));
+      digit_x_position -= 35;
+    }
     this.problemGenerated = true;
     return;
   }
