@@ -18,6 +18,8 @@ function preload() {
     game.load.image('8', 'assets/numbers/eight.png');
     game.load.image('9', 'assets/numbers/nine.png');
     game.load.image('?', 'assets/question_mark.png');
+    game.load.image('continue_button', 'assets/continue_button.png');
+    game.load.image('retry_button', 'assets/retry_button.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
 
@@ -153,6 +155,7 @@ function collectStar(player, star) {
     game.paused = false;
     return;
   };
-  let mathProblem = new MathProblem(game, 'addition', problemSolvedCb);
+  let mathProblem = new MathProblem(game, game.world.centerX,
+    game.world.centerY - 45, 'addition', problemSolvedCb);
   mathProblem.generateProblem();
 }
