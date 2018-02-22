@@ -187,23 +187,37 @@ class MathProblem {
       this.solution.sprites[i].anchor.setTo(0.5);
     }
     this.retryButton.destroy();
+    this._enableNumberButtons();
   }
 
   _promptContinueGameButton() {
+    this._disableNumberButtons();
     this.continueButton =
       this.game.add.button(this.math_panel.position.x,
         this.math_panel.position.y + 290, "continue_button",
         this._markProblemSolved, this);
     this.continueButton.anchor.setTo(0.5);
-  // TODO: make number buttons not clickable
   }
 
   _promptRetryButton() {
+    this._disableNumberButtons();
     this.retryButton =
       this.game.add.button(this.math_panel.position.x,
         this.math_panel.position.y + 290, "retry_button",
         this._resetSolutionAttempt, this);
     this.retryButton.anchor.setTo(0.5);
+  }
+
+  _disableNumberButtons() {
+    for (let i = 0; i < this.number_buttons.length; i++) {
+      this.number_buttons[i].button.input.enabled = false;
+    }
+  }
+
+  _enableNumberButtons() {
+    for (let i = 0; i < this.number_buttons.length; i++) {
+      this.number_buttons[i].button.input.enabled = true;
+    }
   }
 
   _attemptSolution(numberPressed) {
