@@ -30,7 +30,7 @@ class MathProblem {
       {"text": "8", "button": null},
       {"text": "9", "button": null}];
 
-    // Add solution buttons to the panel, coordinates are relative to center 
+    // Add solution buttons to the panel, coordinates are relative to center
     // of panel
     let x_position = this.math_panel.position.x - 100;
     let y_top_position = this.math_panel.position.y + 125;
@@ -77,6 +77,9 @@ class MathProblem {
         return this.prop_value.length === this.value.length;
       }
     };
+
+    this.retryButton = null;
+    this.continueButton = null;
   }
 
   // Must be invoked before the first problem is generated or else error is
@@ -164,6 +167,13 @@ class MathProblem {
     for(let i = 0; i < this.number_buttons.length; i++) {
       this.number_buttons[i].button.destroy();
     }
+    if (this.continueButton !== null) {
+      this.continueButton.destroy();
+    }
+    if (this.retryButton !== null) {
+      this.retryButton.destroy();
+    }
+    this.solved_cb();
   }
 
   // reset the solution UI and prop_value with func
@@ -176,6 +186,24 @@ class MathProblem {
       this.solution.sprites[i] = this.game.add.sprite(x_coord, y_coord, "?");
       this.solution.sprites[i].anchor.setTo(0.5);
     }
+    this.retryButton.destroy();
+  }
+
+  _promptContinueGameButton() {
+    this.continueButton =
+      this.game.add.button(this.math_panel.position.x,
+        this.math_panel.position.y + 290, "continue_button",
+        this._markProblemSolved, this);
+    this.continueButton.anchor.setTo(0.5);
+  // TODO: make number buttons not clickable
+  }
+
+  _promptRetryButton() {
+    this.retryButton =
+      this.game.add.button(this.math_panel.position.x,
+        this.math_panel.position.y + 290, "retry_button",
+        this._resetSolutionAttempt, this);
+    this.retryButton.anchor.setTo(0.5);
   }
 
   _attemptSolution(numberPressed) {
@@ -197,10 +225,9 @@ class MathProblem {
     }
 
     if (this.solution.isCorrect()) {
-      this._markProblemSolved();
-      this.solved_cb();
+      this._promptContinueGameButton();
     } else {
-      this._resetSolutionAttempt();
+      this._promptRetryButton();
     }
     return;
  }
