@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '',
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-div',
   { preload: preload, create: create, update: update });
 
 function preload() {
@@ -33,7 +33,7 @@ var cursors;
 
 var stars;
 var score = 0;
-var scoreText;
+//var scoreText;
 
 function create() {
   //  We're going to be using physics, so enable the Arcade Physics system
@@ -99,7 +99,7 @@ function create() {
   }
 
   //  The score
-  scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+  //scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
   //  Our controls.
   cursors = game.input.keyboard.createCursorKeys();
@@ -151,7 +151,7 @@ function collectStar(player, star) {
     // Removes the star from the screen
     star.kill();
     score += 10;
-    scoreText.text = 'Score: ' + score;
+    //scoreText.text = 'Score: ' + score;
     return;
   };
   let mathProblem = new MathProblem(game, game.world.centerX,

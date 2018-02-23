@@ -265,9 +265,9 @@ class MathProblem {
   }
 
   /*
-   * Check if the proposed solution is correct, prompting the user with 
+   * Check if the proposed solution is correct, prompting the user with
    * 'continue' or 'retry' depending on the result. If the proposed solution
-   * does not yet contain enough digits, then update the solution UI and 
+   * does not yet contain enough digits, then update the solution UI and
    * return.
    *
    * Args:
