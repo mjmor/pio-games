@@ -152,7 +152,6 @@ function collectStar(player, star) {
     star.kill();
     score += 10;
     scoreText.text = 'Score: ' + score;
-    game.paused = false;
     return;
   };
   let mathProblem = new MathProblem(game, game.world.centerX,

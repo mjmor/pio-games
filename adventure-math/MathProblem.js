@@ -1,25 +1,44 @@
 /*
- * TODO: write docs
- *
- *
+ * Class representing a simple math problem (either addition or subtraction)
+ * and the phaser UI components that comprise the problem.
  */
 class MathProblem {
-  constructor(game, x_pos, y_pos, problem_type, solved_cb = null) {
+  /*
+   * Constructor for MathProblem class and skeletal UI.
+   *
+   * Iniatilizes all member properties, pauses the phaser game and constructs
+   * a UI panel with arithmetic operation of type operation centered at
+   * x_pos, y_pos.
+   *
+   * Args:
+   *   game (type: Phaser.Game): the current game to which the MathProblem will
+   *     will be added
+   *   x_pos (type: int): the x coordinate where the center of the math panel
+   *     will be anchored
+   *   y_pos (type: int): the y coordinate where the center of the math panel
+   *     will be anchored
+   *   operation (type: string): the type of operation that the MathPanel will
+   *     prompt to the user. Possible values are: 'addition', 'subtraction'
+   *   solved_cb (type: function): an optional parameter. this function will
+   *     be called when the mathproblem has been correctly solved.
+   */
+  constructor(game, x_pos, y_pos, operation, solved_cb = null) {
     this.game = game;
     this.game.paused = true;
-    this.problem_type = problem_type;
+    this.operation = operation;
     this.problemGenerated = false;
     this.solved_cb = solved_cb;
     this.math_panel = null;
 
-    if (this.problem_type === "addition") {
+    if (this.operation === "addition") {
       this.math_panel = this.game.add.sprite(x_pos, y_pos, 'addition_panel');
-    } else if (this.problem_type === "addition") {
+    } else if (this.operation === "addition") {
       this.math_panel = this.game.add.sprite(x_pos, y_pos, 'subtraction_panel');
     }
     this.math_panel.anchor.setTo(0.5); // center the sprite
 
-    this.number_buttons = [{"text": "0", "button": null},
+    this.number_buttons = [
+      {"text": "0", "button": null},
       {"text": "1", "button": null},
       {"text": "2", "button": null},
       {"text": "3", "button": null},
@@ -28,7 +47,8 @@ class MathProblem {
       {"text": "6", "button": null},
       {"text": "7", "button": null},
       {"text": "8", "button": null},
-      {"text": "9", "button": null}];
+      {"text": "9", "button": null}
+    ];
 
     // Add solution buttons to the panel, coordinates are relative to center
     // of panel
@@ -82,23 +102,26 @@ class MathProblem {
     this.continueButton = null;
   }
 
-  // Must be invoked before the first problem is generated or else error is
-  // thrown.
+  /*
+   * A method to update the solved_cb callback function which is called when
+   * the MathProblem is solved correctly.
+   *
+   * Args:
+   *   solved_cb (type: function): This function will be called when the
+   *     MathProblem has been correctly solved.
+   */
   setSolvedCb(solved_cb) {
     this.solved_cb = solved_cb;
   }
 
-  updateDifficulty(level) {
-    return; // TODO: implement me
-  }
+  //updateDifficulty(level) {
+    //return; // TODO: implement me
+  //}
 
-  // separate out problem construction into another function so that
-  // the caller can set the difficulty level first like so:
-  // let mathProblem = new MathProblem(game, 'addition');
-  // if (score > 45) {
-  //   mathProblem.updateDifficulty(3);
-  // }
-  // mathProblem.generateProblem();
+  /*
+   * Generates random numbers for both operands, determines solution, updates
+   * UI with operands and question marks for solutions digits.
+   */
   generateProblem() {
     let ones_x_position = this.math_panel.position.x - 50;
     let top_operand_y_pos = this.math_panel.position.y - 95;
@@ -115,9 +138,9 @@ class MathProblem {
       this.operands.bot.value));
     this.operands.bot.sprites[this.operands.bot.sprites.length - 1].anchor.setTo(0.5);
 
-    if (this.problem_type === "addition") {
+    if (this.operation === "addition") {
       this.solution.value = parseInt(this.operands.top.value) + parseInt(this.operands.bot.value);
-    } else if (this.problem_type === "subtraction") {
+    } else if (this.operation === "subtraction") {
       this.solution.value = parseInt(this.operands.top.value) - parseInt(this.operands.bot.value);
     }
     this.solution.value = this.solution.value.toString();
@@ -130,9 +153,11 @@ class MathProblem {
       digit_x_position -= 35;
     }
     this.problemGenerated = true;
-    return;
   }
 
+  /*
+   * Generates random numbers for both operands.
+   */
   _generateOperands() {
     this.operands.top.value = Math.floor(
       Math.random() *
@@ -144,9 +169,12 @@ class MathProblem {
     ) + this.operands.bot.lowerbound;
     this.operands.top.value = this.operands.top.value.toString();
     this.operands.bot.value = this.operands.bot.value.toString();
-    return;
   }
 
+  /*
+   * Destroys all UI components of MathProblem, calls solved_cb if it exists,
+   * and resumes the game.
+   */
   _markProblemSolved() {
     this.math_panel.destroy();
     if (this.operands.top.sprites !== null) {
@@ -173,10 +201,16 @@ class MathProblem {
     if (this.retryButton !== null) {
       this.retryButton.destroy();
     }
-    this.solved_cb();
+    if (this.solved_cb !== null) {
+      this.solved_cb();
+    }
+    game.paused = false;
   }
 
-  // reset the solution UI and prop_value with func
+  /*
+   * Return the digits in the solution to question marks, destroy the retry
+   * prompt and enable the number buttons.
+   */
   _resetSolutionAttempt() {
     this.solution.prop_value = "";
     for (let i = 0; i < this.solution.sprites.length; i++) {
@@ -190,6 +224,10 @@ class MathProblem {
     this._enableNumberButtons();
   }
 
+  /*
+   * Disable the number buttons and prompt the user with a 'continue' button
+   * below the math panel.
+   */
   _promptContinueGameButton() {
     this._disableNumberButtons();
     this.continueButton =
@@ -199,6 +237,10 @@ class MathProblem {
     this.continueButton.anchor.setTo(0.5);
   }
 
+  /*
+   * Disable the number buttons and prompt the user with a 'retry' button
+   * below the math panel.
+   */
   _promptRetryButton() {
     this._disableNumberButtons();
     this.retryButton =
@@ -208,18 +250,29 @@ class MathProblem {
     this.retryButton.anchor.setTo(0.5);
   }
 
+  // Disable the number buttons on the math panel so they are not clickable.
   _disableNumberButtons() {
     for (let i = 0; i < this.number_buttons.length; i++) {
       this.number_buttons[i].button.input.enabled = false;
     }
   }
 
+  // Enable the number buttons on the math panel so they are not clickable.
   _enableNumberButtons() {
     for (let i = 0; i < this.number_buttons.length; i++) {
       this.number_buttons[i].button.input.enabled = true;
     }
   }
 
+  /*
+   * Check if the proposed solution is correct, prompting the user with 
+   * 'continue' or 'retry' depending on the result. If the proposed solution
+   * does not yet contain enough digits, then update the solution UI and 
+   * return.
+   *
+   * Args:
+   *   numberPressed (type: string): the number that was clicked by the user.
+   */
   _attemptSolution(numberPressed) {
     if (!this.problemGenerated) {
       return;
@@ -227,7 +280,6 @@ class MathProblem {
     this.solution.prop_value += numberPressed;
     let digit = this.solution.prop_value.length - 1;
     let sprite_idx = this.solution.sprites.length - (digit + 1);
-    console.log("digit: " + digit + " sprite idx: " + sprite_idx);
     let x_coord = this.solution.sprites[sprite_idx].position.x;
     let y_coord = this.solution.sprites[sprite_idx].position.y;
     this.solution.sprites[sprite_idx].destroy(); // remove the previous sprite (?)
@@ -243,6 +295,5 @@ class MathProblem {
     } else {
       this._promptRetryButton();
     }
-    return;
  }
 }
