@@ -23,9 +23,9 @@ function preload() {
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
 
-var NUM_STARS = 12;
-var POINTS_PER_STAR = 10;
-var MAX_SCORE = NUM_STARS * POINTS_PER_STAR;
+const NUM_STARS = 12;
+const POINTS_PER_STAR = 10;
+const MAX_SCORE = NUM_STARS * POINTS_PER_STAR;
 
 var player;
 var platforms;
@@ -33,6 +33,7 @@ var cursors;
 
 var stars;
 var score = 0;
+var game_done = false;
 //var scoreText;
 
 function create() {
@@ -108,6 +109,9 @@ function create() {
 
 function update() {
   //  Collide the player and the stars with the platforms
+  if (game_done) {
+    return;
+  }
   let hitPlatform = game.physics.arcade.collide(player, platforms);
   game.physics.arcade.collide(stars, platforms);
 
@@ -151,6 +155,19 @@ function collectStar(player, star) {
     // Removes the star from the screen
     star.kill();
     score += 10;
+    console.log("Problem solved! Score: " + score);
+    if (score === MAX_SCORE) {
+      game_done = true;
+      console.log("Max score reached!");
+      // stop the player from moving
+      player.body.enable = false;
+      player.animations.getAnimation('left').destroy();
+      player.animations.getAnimation('right').destroy();
+      let star_emitter = game.add.emitter(game.world.centerX, 50, 200);
+      star_emitter.makeParticles('star');
+      star_emitter.start(false /* release particles on interval */,
+        5000 /* live for 5000ms */, 200 /* release star every 250ms */);
+    }
     //scoreText.text = 'Score: ' + score;
     return;
   };
