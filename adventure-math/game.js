@@ -34,6 +34,7 @@ var cursors;
 var stars;
 var score = 0;
 var game_done = false;
+var star_emitter_created = false;
 //var scoreText;
 
 function create() {
@@ -109,10 +110,33 @@ function create() {
 
 function update() {
   //  Collide the player and the stars with the platforms
+  let hitPlatform = game.physics.arcade.collide(player, platforms);
   if (game_done) {
+    if (!star_emitter_created) {
+      // stop the player from moving
+      player.animations.stop();
+      player.body.velocity.x = 0;
+      player.frame = 4;
+      player.animations.getAnimation('left').destroy();
+      player.animations.getAnimation('right').destroy();
+
+      // make a few star emitters
+      let x_coord = game.world.centerX - 300;
+      for (let i = 0; i < 7; i++) {
+        let star_emitter = game.add.emitter(x_coord, 50, 200);
+        x_coord += 100;
+        star_emitter.makeParticles('star');
+        star_emitter.start(false /* release particles on interval */,
+          5000 /* live for 5000ms */, 200 /* release star every 250ms */);
+      }
+      star_emitter_created = true;
+    }
+    // make player continually jump at end of game
+    if (player.body.touching.down && hitPlatform) {
+      player.body.velocity.y = -350;
+    }
     return;
   }
-  let hitPlatform = game.physics.arcade.collide(player, platforms);
   game.physics.arcade.collide(stars, platforms);
 
   //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
@@ -159,14 +183,6 @@ function collectStar(player, star) {
     if (score === MAX_SCORE) {
       game_done = true;
       console.log("Max score reached!");
-      // stop the player from moving
-      player.body.enable = false;
-      player.animations.getAnimation('left').destroy();
-      player.animations.getAnimation('right').destroy();
-      let star_emitter = game.add.emitter(game.world.centerX, 50, 200);
-      star_emitter.makeParticles('star');
-      star_emitter.start(false /* release particles on interval */,
-        5000 /* live for 5000ms */, 200 /* release star every 250ms */);
     }
     //scoreText.text = 'Score: ' + score;
     return;
