@@ -20,6 +20,7 @@ function preload() {
     game.load.image('?', 'assets/question_mark.png');
     game.load.image('continue_button', 'assets/continue_button.png');
     game.load.image('retry_button', 'assets/retry_button.png');
+    game.load.image('restart_button', 'assets/restart_button.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
 
@@ -32,6 +33,7 @@ var platforms;
 var cursors;
 
 var stars;
+var star_emitters = [];
 var score = 0;
 var game_done = false;
 var star_emitter_created = false;
@@ -87,6 +89,17 @@ function create() {
   //  We will enable physics for any star that is created in this group
   stars.enableBody = true;
 
+  dropStars();
+
+  //  The score
+  //scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
+  //  Our controls.
+  cursors = game.input.keyboard.createCursorKeys();
+
+}
+
+function dropStars() {
   //  Here we'll create 12 of them evenly spaced apart
   for (let i = 0; i < 12; i++)
   {
@@ -99,13 +112,19 @@ function create() {
     //  This just gives each star a slightly random bounce value
     star.body.bounce.y = 0.7 + Math.random() * 0.2;
   }
+}
 
-  //  The score
-  //scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-  //  Our controls.
-  cursors = game.input.keyboard.createCursorKeys();
-
+function restartGame() {
+  player.position.x = 32;
+  player.position.y = game.world.height - 150;
+  for (let i = 0; i < star_emitters.length; i++) {
+    star_emitters[i].destroy();
+  }
+  star_emitters = [];
+  dropStars();
+  score = 0;
+  star_emitter_created = false;
+  game_done = false;
 }
 
 function update() {
@@ -117,18 +136,24 @@ function update() {
       player.animations.stop();
       player.body.velocity.x = 0;
       player.frame = 4;
-      player.animations.getAnimation('left').destroy();
-      player.animations.getAnimation('right').destroy();
 
       // make a few star emitters
       let x_coord = game.world.centerX - 300;
       for (let i = 0; i < 7; i++) {
-        let star_emitter = game.add.emitter(x_coord, 50, 200);
+        let emitter_idx =
+          star_emitters.push(game.add.emitter(x_coord, 50, 200)) - 1;
         x_coord += 100;
-        star_emitter.makeParticles('star');
-        star_emitter.start(false /* release particles on interval */,
+        star_emitters[emitter_idx].makeParticles('star');
+        star_emitters[emitter_idx].start(
+          false /* release particles on interval */,
           5000 /* live for 5000ms */, 200 /* release star every 250ms */);
       }
+
+      let restartButton = game.add.button(game.world.centerX,
+          game.world.centerY, "restart_button",
+          function() {restartButton.destroy(); restartGame();}, this);
+      restartButton.anchor.setTo(0.5);
+
       star_emitter_created = true;
     }
     // make player continually jump at end of game
